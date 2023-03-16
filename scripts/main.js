@@ -2,40 +2,6 @@ console.log("Loading main.ts...");
 
 let lastUpdate = new Date().getTime();
 
-function getParent(path) {
-    path = path.split(" ");
-    let j = 0;
-    let currentNode = data[path[j]];
-    while(currentNode !== undefined && currentNode.constructor == Object && path[j+1] != "array" && j+2 < path.length) {
-        // console.log(path[j]);
-        j++;
-        currentNode = currentNode[path[j]];
-    }
-
-    if(path[j+1] == "array") {
-        currentNode = currentNode.options[currentNode.value];
-    }
-
-    return currentNode;
-}
-
-function getData(path) {
-    path = path.split(" ");
-    let j = 0;
-    let currentNode = data[path[j]];
-    while(currentNode !== undefined && currentNode.constructor == Object && path[j+1] != "array" && j+1 < path.length) {
-        // console.log(path[j]);
-        j++;
-        currentNode = currentNode[path[j]];
-    }
-
-    if(path[j+1] == "array") {
-        currentNode = currentNode.options[currentNode.value];
-    }
-
-    return currentNode;
-}
-
 function updateDisplay() {
     // console.log("Updating display...");
 
@@ -54,13 +20,15 @@ function checkMaxes() {
     // console.log("Checking maxes...");
     let resourceKeys = Object.keys(data.resources);
     resourceKeys.forEach(key => {
-        let max = data.resources[key].max;
+        if(data.resources[key].max !== undefined) {
+            let max = data.resources[key].max;
 
-        max.value = max.base;
-        Object.values(max.add).forEach(x => {max.value += x});
-        Object.values(max.mult).forEach(x => {max.value *= 1 + x});
+            max.value = max.base;
+            Object.values(max.add).forEach(x => {max.value += x});
+            Object.values(max.mult).forEach(x => {max.value *= 1 + x});
 
-        data.resources[key].amt = Math.round(Math.min(data.resources[key].amt, max.value)*100)/100;
+            data.resources[key].amt = Math.round(Math.min(data.resources[key].amt, max.value)*100)/100;
+        }
     });
 }
 
@@ -71,7 +39,7 @@ function updateResources(time) {
     keys.forEach(key => {
         let resource = data.resources[key];
         // console.log("Updating resource: " + resource.name);
-        resource.update(time);
+        if(resource.update !== undefined) resource.update(time);
     });
 }
 
@@ -86,19 +54,39 @@ function updatePops(time) {
     });
 }
 
+function checkTimers() {
+    const keys = Object.keys(data.timers);
+    const time = new Date().getTime();
+    let refresh = false;
+
+    keys.forEach(key => {
+        let timer = data.timers[key];
+        if(timer.finish < time) {
+            console.log("Completed timer: " + key);
+            timer.onComplete();
+            delete data.timers[key];
+
+            refresh = true;
+        }
+    });
+
+    if(refresh) refreshTab();
+}
+
 function update() {
-    let time = (new Date().getTime() - lastUpdate)/100;
+    let time = (new Date().getTime() - lastUpdate)/SEC;
     lastUpdate = new Date().getTime();
     // console.log("Updating... Time Since Last Update: " + time + "s");
 
     updateResources(time);
     updatePops(time);
     checkMaxes();
-    refreshTab();
+    checkTimers();
     updateDisplay();
 
     // console.log("Finished update. Time Taken: " + ((new Date().getTime() - lastUpdate)/100) + "s");
 }
 
 swapTab("Population");
-setInterval(update, 100);
+setInterval(update, .1 * SEC);
+setInterval(save, MIN);

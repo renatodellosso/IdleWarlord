@@ -3,6 +3,21 @@ console.log("Loading tabs...");
 let currentTab;
 
 const tabs = {
+    Resources: () => {
+        let html = "<h2>Resources</h2><br>";
+
+        const keys = Object.keys(data.resources);
+        keys.forEach(key => {
+            let resource = data.resources[key];
+
+            html += `<span class="tracker" id="resources ` + key + ` name"></span>: `;
+            html += `<span class="tracker" id="resources ` + key + ` amt"></span>`;
+            if(resource.max !== undefined) html += `/<span class="tracker" id="resources ` + key + ` max value"></span>`;
+            html += "<br>";
+        })
+
+        return html;
+    },
     Population: () => {
         let html = "<h2>Population</h2><br>";
 
@@ -35,10 +50,10 @@ const tabs = {
                             addedHeader = true;
                         }
 
-                        html += `<button onclick="upgrade('buildings ` + key + ` upgrades ` +  uKey + `')">` + upgrades[uKey].name +
-                            ": " + (upgrades[uKey].startTime === undefined ? 
+                        html += `<button class="upgrade" id='buildings ` + key + ` upgrades ` +  uKey + `'>` + upgrades[uKey].name +
+                            ":<br>" + (data.timers[uKey] === undefined || data.timers[uKey].finish === undefined ? 
                                 upgrades[uKey].desc : 
-                                upgrades[uKey].startTime + upgrades[uKey].time - new Date().getTime()) + "</button><br>";
+                                `<span class="tracker" id="timers ` + uKey + ` finish timer"></span>`) + "</button><br>";
                     }
                 });
             }
@@ -48,10 +63,17 @@ const tabs = {
     }
 }
 
+function generateEventListeners() {
+    let elements = document.getElementsByClassName("upgrade");
+    for(let i = 0; i < elements.length; i++)
+        elements.item(i).addEventListener('click', function() { upgrade(elements.item(i).id); });
+}
+
 function swapTab(tab) {
     console.log("Swapping tab to " + tab);
     currentTab = tab;
     document.getElementById("tab").innerHTML = tabs[tab]();
+    generateEventListeners();
 }
 
 function refreshTab() {

@@ -21,19 +21,29 @@ let content = {
       name: "Peasants",
       unlocked: true,
       amt: 10,
-      tax: .1
+      tax: .1,
+      update: (time) => {
+        data.resources.food.amt -= data.population.peasants.amt * time * .05;
+      }
     },
     artisans: {
       name: "Artisans",
       unlocked: true,
       amt: 3,
-      tax: .2
+      tax: .2,
+      update: (time) => {
+        data.resources.food.amt -= data.population.artisans.amt * time * .05;
+      }
     },
     nobles: {
       name: "Nobles",
       unlocked: true,
       amt: 1,
       tax: 5,
+      update: (time) => {
+        data.resources.food.amt -= data.population.nobles.amt * time * .05;
+        data.resources.meat.amt -= data.population.nobles.amt * time * .05;
+      }
     }
   },
   resources: {
@@ -58,7 +68,27 @@ let content = {
         tax *= data.stats.tax.rate * time / 60;
         data.resources.money.amt += tax;
       }
-    }
+    },
+    food: {
+      name: "Food",
+      unlocked: true,
+      amt: 20,
+      max: {
+        base: 40,
+        add: {},
+        mult: {}
+      }
+    },
+    meat: {
+      name: "Meat",
+      unlocked: true,
+      amt: 5,
+      max: {
+        base: 10,
+        add: {},
+        mult: {}
+      }
+    },
   },
   buildings: {
     treasury: {
@@ -67,17 +97,38 @@ let content = {
       unlocked: true,
       upgrades: {
         lvl2: {
-          name: "Larger Storage Room",
-          desc: "Cost: 20 money; Time: 1m; Effect: +50 max money",
-          available: () => { return getData("buildings treasury upgrades lvl2 completed") === undefined },
-          costs: {
-            "resources money amt": 2
+          name: "Larger Storage Room<br>",
+          desc: "Cost: <br>-5 money<br>Time: 5s<br>Effect: +50 max money",
+          available: () => { 
+            return !checkBool(data.buildings.treasury.upgrades.lvl2.completed);
           },
-          time: MIN,
-          benefits: {
-            "resources money max add": 50
-          }
+          costs: {
+            "resources money amt": 5
+          },
+          time: 5 * SEC,
+          onComplete: () => {
+            data.buildings.treasury.upgrades.lvl2.completed = true;
+            data.resources.money.max.add.treasury = 50;
 
+            refreshTab();
+          }
+        },
+        lvl3: {
+          name: "Even Larger Storage Room",
+          desc: "Cost: <br>-70 money<br>Time: 5m<br>Effect: +150 max money",
+          available: () => { 
+            return checkBool(data.buildings.treasury.upgrades.lvl2.completed) && !checkBool(data.buildings.treasury.upgrades.lvl3.completed);
+          },
+          costs: {
+            "resources money amt": 70
+          },
+          time: 5 * MIN,
+          onComplete: () => {
+            data.buildings.treasury.upgrades.lvl3.completed = true;
+            data.resources.money.max.add.treasury = 200;
+
+            refreshTab();
+          }
         }
       }
     }
