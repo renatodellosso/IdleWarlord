@@ -14,10 +14,10 @@ function upgrade(path) {
         costKeys.forEach(key => {
             console.log(key);
             console.log(getData(key));
-            getData(key) -= upgrade.costs[key];
+            getParent(key)[key.split(" ")[key.split(" ").length-1]] -= upgrade.costs[key];
         });
 
-        upgrade.startTime = new Date().getTime;
+        upgrade.startTime = new Date().getTime();
 
         refreshTab();
     }

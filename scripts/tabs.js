@@ -38,7 +38,7 @@ const tabs = {
                         html += `<button onclick="upgrade('buildings ` + key + ` upgrades ` +  uKey + `')">` + upgrades[uKey].name +
                             ": " + (upgrades[uKey].startTime === undefined ? 
                                 upgrades[uKey].desc : 
-                                new Date().getTime() - upgrades[uKey].startTime) + "</button><br>";
+                                upgrades[uKey].startTime + upgrades[uKey].time - new Date().getTime()) + "</button><br>";
                     }
                 });
             }

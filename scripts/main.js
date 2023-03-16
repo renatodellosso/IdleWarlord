@@ -2,6 +2,23 @@ console.log("Loading main.ts...");
 
 let lastUpdate = new Date().getTime();
 
+function getParent(path) {
+    path = path.split(" ");
+    let j = 0;
+    let currentNode = data[path[j]];
+    while(currentNode !== undefined && currentNode.constructor == Object && path[j+1] != "array" && j+2 < path.length) {
+        // console.log(path[j]);
+        j++;
+        currentNode = currentNode[path[j]];
+    }
+
+    if(path[j+1] == "array") {
+        currentNode = currentNode.options[currentNode.value];
+    }
+
+    return currentNode;
+}
+
 function getData(path) {
     path = path.split(" ");
     let j = 0;
@@ -77,6 +94,7 @@ function update() {
     updateResources(time);
     updatePops(time);
     checkMaxes();
+    refreshTab();
     updateDisplay();
 
     // console.log("Finished update. Time Taken: " + ((new Date().getTime() - lastUpdate)/100) + "s");
