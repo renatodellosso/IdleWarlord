@@ -24,8 +24,19 @@ const tabs = {
         const popKeys = Object.keys(data.population);
         popKeys.forEach(key => {
             const pop = data.population[key];
+
             if(pop.unlocked)
-                html += pop.name + ': <span class="tracker" id="population ' + key + ' amt"></span><br>';
+                html += pop.name + ' (<span class="tracker" id="population ' + key + ' amt"></span>): ' + (pop.desc !== undefined ? ' - '+ pop.desc : '');
+            
+            if(pop.train !== undefined) {
+                html += ` - <button class="train" id="` + key + `">Train - ` + pop.train.text + `</button>`;
+            }
+            
+            if(pop.untrain !== undefined) {
+                html += ` - <button class="untrain" id="` + key + `">Untrain - ` + pop.untrain.text + `</button>`;
+            }
+
+            html += "<br>";
         });
 
         return html;

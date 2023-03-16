@@ -20,7 +20,7 @@ let content = {
     peasants: {
       name: "Peasants",
       unlocked: true,
-      amt: 10,
+      amt: 3,
       tax: .1,
       update: (time) => {
         data.resources.food.amt -= data.population.peasants.amt * time * .05;
@@ -29,7 +29,7 @@ let content = {
     artisans: {
       name: "Artisans",
       unlocked: true,
-      amt: 3,
+      amt: 2,
       tax: .2,
       update: (time) => {
         data.resources.food.amt -= data.population.artisans.amt * time * .05;
@@ -41,8 +41,40 @@ let content = {
       amt: 1,
       tax: 5,
       update: (time) => {
-        data.resources.food.amt -= data.population.nobles.amt * time * .05;
-        data.resources.meat.amt -= data.population.nobles.amt * time * .05;
+        data.resources.food.amt -= data.population.nobles.amt * time * .1;
+        data.resources.meat.amt -= data.population.nobles.amt * time * .1;
+      }
+    },
+    farmers: {
+      name: "Farmers",
+      desc: "Produces food and meat",
+      unlocked: true,
+      amt: 5,
+      tax: .5,
+      production: {
+        food: .1,
+        meat: .01,
+      },
+      update: (time) => {
+        data.resources.food.amt += data.population.farmers.amt * time * data.population.farmers.production.food;
+        data.resources.meat.amt += data.population.farmers.amt * time * data.population.farmers.production.meat;
+      },
+      train: {
+        text: "Costs 2 money, takes 10s",
+        costs: {
+          "resources money amt": 2
+        },
+        time: 10 * SEC,
+        onComplete: () => {
+          data.population.farmers.amt++;
+        }
+      },
+      untrain: {
+        text: "Takes 10s",
+        time: SEC,
+        onComplete: () => {
+          data.population.peasants.amt++;
+        }
       }
     }
   },
@@ -97,7 +129,7 @@ let content = {
       unlocked: true,
       upgrades: {
         lvl2: {
-          name: "Larger Storage Room<br>",
+          name: "Larger Storage Room",
           desc: "Cost: <br>-5 money<br>Time: 5s<br>Effect: +50 max money",
           available: () => { 
             return !checkBool(data.buildings.treasury.upgrades.lvl2.completed);

@@ -13,10 +13,15 @@ function update(obj/*, …*/) {
     for (var i=1; i<arguments.length; i++) {
         for (var prop in arguments[i]) {
             var val = arguments[i][prop];
-            if (typeof val == "object") // this also applies to arrays or null!
+            if (typeof val == "object") { // this also applies to arrays or null!
+                console.log(prop);
                 update(obj[prop], val);
-            else
-                obj[prop] = val;
+            } else {
+                console.log(prop + " " + obj[prop] + " " + (obj[prop] instanceof Function));
+                if(obj[prop] instanceof Function)
+                    obj[prop] = val;
+                else obj[prop] = eval(val);
+            }
         }
     }
     return obj;
@@ -24,10 +29,12 @@ function update(obj/*, …*/) {
 
 function load() {
     console.log("Loading save...");
-
     let save = JSON.parse(localStorage.getItem("idlewarlordsave"));
-    update(data, save);
     
+    data.timers = save.timers;
+
+    update(data, save);
+
     console.log("Loaded save");
 }
 

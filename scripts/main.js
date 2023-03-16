@@ -28,7 +28,8 @@ function checkMaxes() {
             Object.values(max.mult).forEach(x => {max.value *= 1 + x});
 
             data.resources[key].amt = Math.round(Math.min(data.resources[key].amt, max.value)*100)/100;
-        }
+        };
+        data.resources[key].amt = Math.max(data.resources[key].amt, 0);
     });
 }
 
