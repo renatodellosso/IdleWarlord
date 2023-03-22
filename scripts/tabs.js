@@ -29,7 +29,8 @@ const tabs = {
                 html += pop.name + ' (<span class="tracker" id="population ' + key + ' amt"></span>): ' + (pop.desc !== undefined ? ' - '+ pop.desc : '');
             
             if(pop.train !== undefined) {
-                html += ` - <button class="train" id="` + key + `">Train - ` + pop.train.text + `</button>`;
+                html += ` - <button class="train" id="` + key + `">Train - ` + pop.train.text + ` (` + 
+                    tracker("population " + key + " train inProgress") + ` in progress)</button>`;
             }
             
             if(pop.untrain !== undefined) {
@@ -62,11 +63,13 @@ const tabs = {
                         }
 
                         html += `<button class="upgrade" id='buildings ` + key + ` upgrades ` +  uKey + `'>` + upgrades[uKey].name +
-                            ":<br>" + (data.timers[uKey] === undefined || data.timers[uKey].finish === undefined ? 
+                            ":<br>" + (data.timers[key + "-" + uKey] === undefined || data.timers[key + "-" + uKey].finish === undefined ? 
                                 upgrades[uKey].desc : 
-                                `<span class="tracker" id="timers ` + uKey + ` finish timer"></span>`) + "</button><br>";
+                                `<span class="tracker" id="timers ` + key + `-` + uKey + ` finish timer"></span>`) + "</button><br>";
                     }
                 });
+
+                html += "<br>";
             }
         });
 
@@ -76,8 +79,23 @@ const tabs = {
 
 function generateEventListeners() {
     let elements = document.getElementsByClassName("upgrade");
-    for(let i = 0; i < elements.length; i++)
-        elements.item(i).addEventListener('click', function() { upgrade(elements.item(i).id); });
+    // console.log(elements);
+    for(let i = 0; i < elements.length; i++) {
+        let id = elements.item(i).id;
+        elements.item(i).addEventListener('click', function() { upgrade(id); });
+    }
+
+    elements = document.getElementsByClassName("train");
+    for(let i = 0; i < elements.length; i++) {
+        let id = elements.item(i).id;
+        elements.item(i).addEventListener('click', function() { train(id); });
+    }
+
+    elements = document.getElementsByClassName("untrain");
+    for(let i = 0; i < elements.length; i++) {
+        let id = elements.item(i).id;
+        elements.item(i).addEventListener('click', function() { untrain(id); });
+    }
 }
 
 function swapTab(tab) {

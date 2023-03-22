@@ -69,3 +69,15 @@ function formatTime(time) {
 function checkBool(bool) {
     return bool !== undefined && bool;
 }
+
+function clearSave() {
+    let accept = confirm("Are you sure you want to wipe your save? This cannot be undone!")
+    if(accept) {
+        localStorage.removeItem("idlewarlordsave");
+        location.reload();
+    }
+}
+
+function tracker(path) {
+    return `<span class="tracker" id="` + path + `"></span>`;
+}

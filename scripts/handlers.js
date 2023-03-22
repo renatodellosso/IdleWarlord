@@ -18,11 +18,45 @@ function upgrade(path) {
             getParent(key)[key.split(" ")[key.split(" ").length-1]] -= upgrade.costs[key];
         });
 
-        data.timers[getDataID(path)] = {
+        data.timers[ path.split(' ')[path.split(' ').length-3] + "-" + getDataID(path)] = {
             finish: new Date().getTime() + upgrade.time,
             onComplete: upgrade.onComplete
         };
 
         refreshTab();
     }
+}
+
+function train(key) {
+    console.log("Attempting to train " + key);
+    let pop = data.population[key];
+
+    let canTrigger = true;
+    const costKeys = Object.keys(pop.train.costs);
+    costKeys.forEach(key => {
+        if(getData(key) < pop.train.costs[key])
+            canTrigger = false;
+    });
+
+    if(canTrigger) {
+        console.log("Training " + key);
+
+        pop.train.inProgress++;
+
+        costKeys.forEach(key => {
+            getParent(key)[key.split(" ")[key.split(" ").length-1]] -= pop.train.costs[key];
+        });
+
+        data.timers[getDataID(key) + " train " + Math.random()] = {
+            finish: new Date().getTime() + pop.train.time,
+            onComplete: pop.train.onComplete
+        };
+
+    }
+}
+
+function untrain(key) {
+    console.log("Untraining " + key);
+    if(data.population[key].amt > 0)
+        data.population[key].untrain.onTrigger();
 }

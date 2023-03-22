@@ -1,7 +1,5 @@
 console.log("Loading main.ts...");
 
-let lastUpdate = new Date().getTime();
-
 function updateDisplay() {
     // console.log("Updating display...");
 
@@ -12,7 +10,7 @@ function updateDisplay() {
         let tracker = trackers.item(i);
         // console.log("Updating tracker: " + tracker.id);
 
-        tracker.innerHTML = getData(tracker.id);  ;
+        tracker.innerHTML = getData(tracker.id);
     }
 }
 
@@ -51,7 +49,7 @@ function updatePops(time) {
     keys.forEach(key => {
         let pop = data.population[key];
         // console.log("Updating pop: " + pop.name);
-        if(pop.update !== undefined) pop.update(time);
+        if(pop.update !== undefined && pop.needsMet()) pop.update(time);
     });
 }
 
@@ -75,8 +73,9 @@ function checkTimers() {
 }
 
 function update() {
-    let time = (new Date().getTime() - lastUpdate)/SEC;
-    lastUpdate = new Date().getTime();
+    if(data.lastUpdate === undefined) data.lastUpdate = new Date().getTime();
+    let time = (new Date().getTime() - data.lastUpdate)/SEC;
+    data.lastUpdate = new Date().getTime();
     // console.log("Updating... Time Since Last Update: " + time + "s");
 
     updateResources(time);
@@ -90,4 +89,4 @@ function update() {
 
 swapTab("Population");
 setInterval(update, .1 * SEC);
-setInterval(save, MIN);
+setInterval(save, 10 * SEC);
